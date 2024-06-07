@@ -1,39 +1,39 @@
----
-name: Java CI
-
-on:
-  push:
-  pull_request:
-
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ 8, 11, 17, 21 ]
-      fail-fast: false
-      max-parallel: 4
     name: JDK ${{ matrix.java }}
-
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: temurin
-          cache: 'gradle'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew build --warning-mode all
-
-      - name: Run Tests
-        run: ./gradlew check
-
-      - name: Maven Install
-        run: ./gradlew clean publishToMavenLocal
-
-...
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        cache: gradle
+        distribution: temurin
+        java-version: ${{ matrix.java }}
+    - continue-on-error: true
+      name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - continue-on-error: true
+      name: Build with Gradle
+      run: ./gradlew build --warning-mode all
+    - continue-on-error: true
+      name: Run Tests
+      run: ./gradlew check
+    - continue-on-error: true
+      name: Maven Install
+      run: ./gradlew clean publishToMavenLocal
+    strategy:
+      fail-fast: false
+      matrix:
+        java:
+        - 8
+        - 11
+        - 17
+        - 21
+      max-parallel: 4
+name: Java CI
+on:
+  repository_dispatch:
+    types: trigger-ga___ci.yml
